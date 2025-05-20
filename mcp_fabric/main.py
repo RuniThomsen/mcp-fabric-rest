@@ -5,6 +5,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from typing import Any
+
+
+def run_server(server: HTTPServer) -> None:
+    """Run the given server until interrupted."""
 
     print("mcp-fabric-rest server started", flush=True)
     try:
@@ -16,11 +23,11 @@ import sys
 class RestHandler(BaseHTTPRequestHandler):
     """Simple REST request handler."""
 
-    def _send_json(self, code: int, body: str) -> None:
+    def _send_json(self, code: int, body: Any) -> None:
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
-        self.wfile.write(body.encode("utf-8"))
+        self.wfile.write(json.dumps(body).encode("utf-8"))
 
     def log_message(self, format: str, *args: str) -> None:  # noqa: D401
         """Silence default logging."""
@@ -29,30 +36,38 @@ class RestHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: D401
         """Handle GET requests."""
         if self.path == "/health":
-            self._send_json(200, '{"status": "ok"}')
+            self._send_json(200, {"status": "ok"})
         elif self.path == "/v1/workspaces":
-            self._send_json(200, "[]")
+            self._send_json(200, {"workspaces": []})
         elif self.path == "/v1/artifacts":
-            self._send_json(200, "[]")
+            self._send_json(200, {"artifacts": []})
         else:
             self.send_error(404)
 
     def do_POST(self) -> None:  # noqa: D401
         """Handle POST requests."""
         if self.path in {"/v1/workspaces", "/v1/artifacts"}:
-            self._send_json(201, "{}")
+            # Consume the request body even if we ignore it
+            content_length = int(self.headers.get("Content-Length", 0))
+            if content_length:
+                self.rfile.read(content_length)
+            self._send_json(201, {"created": True})
         else:
             self.send_error(404)
 
 
+def create_server(host: str = "localhost", port: int = 3000) -> HTTPServer:
+    """Create the REST server instance."""
+
+    return HTTPServer((host, port), RestHandler)
+
+
 def run_rest_server(host: str = "localhost", port: int = 3000) -> None:
     """Start a REST HTTP server."""
-    server = HTTPServer((host, port), RestHandler)
+    server = create_server(host, port)
     print(f"REST server listening on http://{host}:{port}", flush=True)
     try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
+        run_server(server)
     finally:
         server.server_close()
 
@@ -72,7 +87,7 @@ def main(argv: list[str] | None = None) -> None:
         threads.append(thread)
 
     if args.stdio:
-        run_server()
+        print("mcp-fabric-rest server started", flush=True)
         try:
             for line in sys.stdin:
                 # Echo received lines back to stdout
