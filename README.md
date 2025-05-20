@@ -42,3 +42,17 @@ Configuration for these options is typically provided through environment variab
 
 These endpoints are a starting point and may be expanded as the server evolves.
 
+
+## Running Tests
+
+This project uses [Poetry](https://python-poetry.org/) to manage Python dependencies.
+Install them and run the test suite using:
+
+```bash
+poetry install
+poetry run pytest -m compliance
+poetry run bandit -r mcp_fabric_rest
+poetry run mypy --strict mcp_fabric_rest
+# Optional if installed
+trivy fs .
+```

@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "mcp-fabric-rest"
+version = "0.1.0"
+description = "MCP Fabric REST server"
+authors = ["Codex User <user@example.com>"]
+packages = [{include = "mcp_fabric_rest"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4"
+bandit = "^1.7"
+mypy = "^1.9"
