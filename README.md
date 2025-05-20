@@ -1,6 +1,6 @@
 # mcp-fabric-rest
 
-MCP Server for Microsoft Fabric Rest API's to be used primarily in Visual Studio Code and Codex.
+MCP Server for Microsoft Fabric REST APIs to be used primarily in Visual Studio Code and Codex.
 
 ## Overview
 
