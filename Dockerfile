@@ -2,16 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry
+# Copy local wheel packages
+COPY packages /app/packages
 
 # Copy project files
-COPY pyproject.toml /app/
+COPY pyproject.toml requirements.txt /app/
 COPY mcp_fabric /app/mcp_fabric
 
-# Install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install
+# Install dependencies using local wheels and install project
+RUN pip install --no-index --find-links=/app/packages -r requirements.txt \
+    && pip install -e .
 
 # Create non-root user
 RUN useradd -m appuser
