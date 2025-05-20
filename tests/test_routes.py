@@ -1,5 +1,4 @@
 import json
-import socket
 import threading
 import time
 from urllib import request
@@ -11,11 +10,7 @@ from mcp_fabric.main import create_server
 
 @pytest.fixture(scope="module")
 def server():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(("localhost", 0))
-        port = sock.getsockname()[1]
-
-    srv = create_server(port=port)
+    srv = create_server(port=0)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
     time.sleep(0.1)
