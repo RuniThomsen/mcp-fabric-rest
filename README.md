@@ -8,37 +8,52 @@ The server exposes a REST interface that acts as a bridge between the Microsoft 
 
 ## Requirements
 
-- [Node.js](https://nodejs.org/) 18 or later
-- npm (comes with Node.js)
+- Python 3.11
+- [Poetry](https://python-poetry.org/) for dependency management
 
 ## Setup
 
 1. Install dependencies:
    ```bash
-   npm install
+   poetry install
    ```
-2. Start the server:
+2. Start the server over STDIO:
    ```bash
-   npm start
+   poetry run python -m mcp_fabric.main --stdio
+   ```
+   Optional REST and gRPC façades can be enabled with flags:
+   ```bash
+   poetry run python -m mcp_fabric.main --stdio --rest --grpc
    ```
 
-The service will listen on `http://localhost:3000` by default.
+With REST enabled the service listens on `http://localhost:3000`.
 
 ## Authentication
 
-Depending on the environment, the server can be configured to use one of the following authentication methods:
+The server supports two authentication modes:
 
-- **API Key** via the `Authorization` header.
-- **OAuth Token** obtained from Azure Active Directory.
+- **Managed Identity** – used when running inside Azure with an identity assigned to the host.
+- **Service Principal** – specify `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` and `AZURE_CLIENT_SECRET` environment variables.
 
 Configuration for these options is typically provided through environment variables or a configuration file.
 
 ## REST Endpoints
 
 - `GET /health` – health check endpoint used by deployments or tools.
-- `POST /authenticate` – obtain a token or validate provided credentials.
-- `GET /projects` – list projects within MCP.
-- `POST /projects` – create a new project in MCP.
+- `GET /v1/workspaces` – list Fabric workspaces accessible to the caller.
+- `POST /v1/workspaces` – create a new workspace.
+- `GET /v1/artifacts` – list artifacts (datasets, reports, notebooks, etc.).
+- `POST /v1/artifacts` – create an artifact within a workspace.
 
 These endpoints are a starting point and may be expanded as the server evolves.
+
+## Testing
+
+Run the unit tests with `pytest`:
+
+```bash
+poetry run pytest
+```
+
+The project includes a CI workflow that executes the same command for every pull request to ensure the server remains stable.
 
