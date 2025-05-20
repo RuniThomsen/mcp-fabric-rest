@@ -23,7 +23,8 @@ def run_server(server: HTTPServer) -> None:
 class RestHandler(BaseHTTPRequestHandler):
     """Simple REST request handler."""
 
-    def _send_json(self, code: int, body: Any) -> None:
+    def _send_json(self, code: int, body: object) -> None:
+        """Serialize ``body`` to JSON and send it with the given status code."""
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
