@@ -6,11 +6,18 @@ from urllib import request, error
 
 import pytest
 
-from mcp_fabric.main import create_server, run_server
+from mcp_fabric.main import (
+    ARTIFACTS,
+    WORKSPACES,
+    create_server,
+    run_server,
+)
 
 
 @pytest.fixture(scope="module")
 def run_srv():
+    WORKSPACES.clear()
+    ARTIFACTS.clear()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("localhost", 0))
         port = sock.getsockname()[1]
@@ -58,6 +65,10 @@ def test_run_server_workspaces_post(run_srv):
     assert status == 201
     assert body == {"created": True}
 
+    status, body = _request(run_srv, "/v1/workspaces")
+    assert status == 200
+    assert body == {"workspaces": [{"name": "test"}]}
+
 
 def test_run_server_artifacts_get(run_srv):
     status, body = _request(run_srv, "/v1/artifacts")
@@ -71,6 +82,11 @@ def test_run_server_artifacts_post(run_srv):
     assert status == 201
     assert body == {"created": True}
 
+codex/implement-post-get-for-in-memory-storage
+    status, body = _request(run_srv, "/v1/artifacts")
+    assert status == 200
+    assert body == {"artifacts": [{"name": "test"}]}
+
 
 def test_run_server_unknown_get(run_srv):
     status, body = _request(run_srv, "/unknown")
@@ -83,3 +99,4 @@ def test_run_server_unknown_post(run_srv):
     status, body = _request(run_srv, "/unknown", data=data, method="POST")
     assert status == 404
     assert body == {"error": "not found"}
+main

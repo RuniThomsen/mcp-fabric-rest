@@ -9,6 +9,12 @@ import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
 
+# In-memory storage for created objects
+WORKSPACES: list[dict[str, Any]] = []
+"""Workspace records stored during runtime."""
+ARTIFACTS: list[dict[str, Any]] = []
+"""Artifact records stored during runtime."""
+
 
 def run_server(server: HTTPServer) -> None:
     """Run the given server until interrupted."""
@@ -39,19 +45,30 @@ class RestHandler(BaseHTTPRequestHandler):
         if self.path == "/health":
             self._send_json(200, {"status": "ok"})
         elif self.path == "/v1/workspaces":
-            self._send_json(200, {"workspaces": []})
+            self._send_json(200, {"workspaces": WORKSPACES})
         elif self.path == "/v1/artifacts":
-            self._send_json(200, {"artifacts": []})
+            self._send_json(200, {"artifacts": ARTIFACTS})
         else:
             self._send_json(404, {"error": "not found"})
 
     def do_POST(self) -> None:  # noqa: D401
         """Handle POST requests."""
         if self.path in {"/v1/workspaces", "/v1/artifacts"}:
-            # Consume the request body even if we ignore it
             content_length = int(self.headers.get("Content-Length", 0))
+            payload: Any = {}
             if content_length:
-                self.rfile.read(content_length)
+                body = self.rfile.read(content_length)
+                try:
+                    payload = json.loads(body.decode("utf-8"))
+                except json.JSONDecodeError:
+                    self.send_error(400, "Invalid JSON")
+                    return
+
+            if self.path == "/v1/workspaces":
+                WORKSPACES.append(payload)
+            else:
+                ARTIFACTS.append(payload)
+
             self._send_json(201, {"created": True})
         else:
             self._send_json(404, {"error": "not found"})
