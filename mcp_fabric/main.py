@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
-
-def run_server() -> None:
-    """Start the server in STDIO mode."""
     print("mcp-fabric-rest server started", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
 
 class RestHandler(BaseHTTPRequestHandler):
