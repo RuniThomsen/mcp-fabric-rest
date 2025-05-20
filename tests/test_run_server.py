@@ -82,7 +82,6 @@ def test_run_server_artifacts_post(run_srv):
     assert status == 201
     assert body == {"created": True}
 
-codex/implement-post-get-for-in-memory-storage
     status, body = _request(run_srv, "/v1/artifacts")
     assert status == 200
     assert body == {"artifacts": [{"name": "test"}]}
@@ -99,4 +98,3 @@ def test_run_server_unknown_post(run_srv):
     status, body = _request(run_srv, "/unknown", data=data, method="POST")
     assert status == 404
     assert body == {"error": "not found"}
-main
