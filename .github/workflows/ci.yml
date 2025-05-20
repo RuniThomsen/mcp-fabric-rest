@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.6.1'
+      - run: poetry install
+      - run: poetry run pytest -m compliance
+      - run: poetry run bandit -r mcp_fabric_rest
+      - run: poetry run mypy --strict mcp_fabric_rest
+      - name: Trivy scan
+        run: |
+          if command -v trivy >/dev/null 2>&1; then
+            trivy fs --exit-code 0 .
+          else
+            echo "Trivy not available"
+          fi
