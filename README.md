@@ -17,6 +17,8 @@ The server exposes a REST interface that acts as a bridge between the Microsoft 
    ```bash
    poetry install
    ```
+   If internet access isn't available, run `install_offline.ps1` instead.
+   Detailed steps are provided in [CODEX_SETUP.md](CODEX_SETUP.md).
 2. Start the server over STDIO:
    ```bash
    poetry run python -m mcp_fabric.main --stdio
