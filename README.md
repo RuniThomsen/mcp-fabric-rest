@@ -56,3 +56,7 @@ poetry run mypy --strict mcp_fabric_rest
 # Optional if installed
 trivy fs .
 ```
+
+## License
+
+This project is licensed under the terms of the MIT License. See [LICENSE](LICENSE) for details.
