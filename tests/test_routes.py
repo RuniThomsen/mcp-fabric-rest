@@ -1,7 +1,7 @@
 import json
 import threading
 import time
-from urllib import request
+from urllib import request, error
 
 import pytest
 
@@ -32,9 +32,13 @@ def _request(server, path: str, data: bytes | None = None, method: str = "GET"):
         f"http://localhost:{server.server_port}{path}", data=data, method=method
     )
     req.add_header("Content-Type", "application/json")
-    with request.urlopen(req) as resp:
-        body = resp.read()
-        return resp.status, json.loads(body)
+    try:
+        with request.urlopen(req) as resp:
+            body = resp.read()
+            return resp.status, json.loads(body)
+    except error.HTTPError as exc:
+        body = exc.read()
+        return exc.code, json.loads(body)
 
 
 def test_health(server):
@@ -72,6 +76,21 @@ def test_artifacts_post(server):
     assert status == 201
     assert body == {"created": True}
 
+codex/implement-post-get-for-in-memory-storage
     status, body = _request(server, "/v1/artifacts")
     assert status == 200
     assert body == {"artifacts": [{"name": "test"}]}
+
+
+def test_unknown_get(server):
+    status, body = _request(server, "/unknown")
+    assert status == 404
+    assert body == {"error": "not found"}
+
+
+def test_unknown_post(server):
+    data = json.dumps({"key": "value"}).encode()
+    status, body = _request(server, "/unknown", data=data, method="POST")
+    assert status == 404
+    assert body == {"error": "not found"}
+main

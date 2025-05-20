@@ -49,7 +49,7 @@ class RestHandler(BaseHTTPRequestHandler):
         elif self.path == "/v1/artifacts":
             self._send_json(200, {"artifacts": ARTIFACTS})
         else:
-            self.send_error(404)
+            self._send_json(404, {"error": "not found"})
 
     def do_POST(self) -> None:  # noqa: D401
         """Handle POST requests."""
@@ -71,17 +71,33 @@ class RestHandler(BaseHTTPRequestHandler):
 
             self._send_json(201, {"created": True})
         else:
-            self.send_error(404)
+            self._send_json(404, {"error": "not found"})
 
 
 def create_server(host: str = "localhost", port: int = 3000) -> HTTPServer:
-    """Create the REST server instance."""
+    """Create the REST server instance.
+
+    Parameters
+    ----------
+    host:
+        Interface the HTTP server should bind to.
+    port:
+        Port the HTTP server should listen on.
+    """
 
     return HTTPServer((host, port), RestHandler)
 
 
 def run_rest_server(host: str = "localhost", port: int = 3000) -> None:
-    """Start a REST HTTP server."""
+    """Start a REST HTTP server.
+
+    Parameters
+    ----------
+    host:
+        Interface the HTTP server should bind to.
+    port:
+        Port the HTTP server should listen on.
+    """
     server = create_server(host, port)
     print(f"REST server listening on http://{host}:{port}", flush=True)
     try:
@@ -98,6 +114,11 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--port", type=int, default=3000, help="port for REST HTTP server"
     )
+    parser.add_argument(
+        "--host",
+        default="localhost",
+        help="host interface for REST HTTP server",
+    )
     args = parser.parse_args(argv)
 
     threads: list[threading.Thread] = []
@@ -105,7 +126,7 @@ def main(argv: list[str] | None = None) -> None:
     if args.rest:
         thread = threading.Thread(
             target=run_rest_server,
-            kwargs={"port": args.port},
+            kwargs={"port": args.port, "host": args.host},
             daemon=args.stdio,
         )
         thread.start()
