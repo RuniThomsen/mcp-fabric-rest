@@ -24,10 +24,11 @@ The server exposes a REST interface that acts as a bridge between the Microsoft 
    poetry run python -m mcp_fabric.main --stdio
    ```
 
-   poetry run python -m mcp_fabric.main --stdio --rest
+   poetry run python -m mcp_fabric.main --stdio --rest --host 0.0.0.0
    ```
 
-With REST enabled the service listens on `http://localhost:3000`.
+With REST enabled the service listens on `http://localhost:3000` by default.
+Use `--host` and `--port` to change the bind address.
 
 ## Authentication
 
