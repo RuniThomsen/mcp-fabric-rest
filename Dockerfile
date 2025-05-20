@@ -11,7 +11,7 @@ COPY mcp_fabric /app/mcp_fabric
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-root
+    && poetry install
 
 # Create non-root user
 RUN useradd -m appuser
