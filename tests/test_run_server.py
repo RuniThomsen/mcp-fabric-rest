@@ -2,7 +2,7 @@ import json
 import socket
 import threading
 import time
-from urllib import request
+from urllib import request, error
 
 import pytest
 
@@ -31,9 +31,13 @@ def _request(server, path: str, data: bytes | None = None, method: str = "GET"):
         f"http://localhost:{server.server_port}{path}", data=data, method=method
     )
     req.add_header("Content-Type", "application/json")
-    with request.urlopen(req) as resp:
-        body = resp.read()
-        return resp.status, json.loads(body)
+    try:
+        with request.urlopen(req) as resp:
+            body = resp.read()
+            return resp.status, json.loads(body)
+    except error.HTTPError as exc:
+        body = exc.read()
+        return exc.code, json.loads(body)
 
 
 def test_run_server_health(run_srv):
@@ -66,3 +70,16 @@ def test_run_server_artifacts_post(run_srv):
     status, body = _request(run_srv, "/v1/artifacts", data=data, method="POST")
     assert status == 201
     assert body == {"created": True}
+
+
+def test_run_server_unknown_get(run_srv):
+    status, body = _request(run_srv, "/unknown")
+    assert status == 404
+    assert body == {"error": "not found"}
+
+
+def test_run_server_unknown_post(run_srv):
+    data = json.dumps({"foo": "bar"}).encode()
+    status, body = _request(run_srv, "/unknown", data=data, method="POST")
+    assert status == 404
+    assert body == {"error": "not found"}
