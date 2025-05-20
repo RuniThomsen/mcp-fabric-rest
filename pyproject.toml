@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "mcp-fabric-rest"
+version = "0.1.0"
+description = "MCP Server for Microsoft Fabric REST APIs"
+authors = ["Your Name <name@example.com>"]
+packages = [{include = "mcp_fabric"}]
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+
+[tool.poetry.scripts]
+mcp-fabric-rest = "mcp_fabric.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
