@@ -21,9 +21,8 @@ The server exposes a REST interface that acts as a bridge between the Microsoft 
    ```bash
    poetry run python -m mcp_fabric.main --stdio
    ```
-   Optional REST and gRPC façades can be enabled with flags:
-   ```bash
-   poetry run python -m mcp_fabric.main --stdio --rest --grpc
+
+   poetry run python -m mcp_fabric.main --stdio --rest
    ```
 
 With REST enabled the service listens on `http://localhost:3000`.
