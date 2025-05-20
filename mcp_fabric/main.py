@@ -77,12 +77,19 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="MCP Fabric REST server")
     parser.add_argument("--stdio", action="store_true", help="run server using stdio")
     parser.add_argument("--rest", action="store_true", help="run REST HTTP server")
+    parser.add_argument(
+        "--port", type=int, default=3000, help="port for REST HTTP server"
+    )
     args = parser.parse_args(argv)
 
     threads: list[threading.Thread] = []
 
     if args.rest:
-        thread = threading.Thread(target=run_rest_server, daemon=args.stdio)
+        thread = threading.Thread(
+            target=run_rest_server,
+            kwargs={"port": args.port},
+            daemon=args.stdio,
+        )
         thread.start()
         threads.append(thread)
 
