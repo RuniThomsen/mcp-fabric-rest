@@ -43,7 +43,7 @@ class RestHandler(BaseHTTPRequestHandler):
         elif self.path == "/v1/artifacts":
             self._send_json(200, {"artifacts": []})
         else:
-            self.send_error(404)
+            self._send_json(404, {"error": "not found"})
 
     def do_POST(self) -> None:  # noqa: D401
         """Handle POST requests."""
@@ -54,7 +54,7 @@ class RestHandler(BaseHTTPRequestHandler):
                 self.rfile.read(content_length)
             self._send_json(201, {"created": True})
         else:
-            self.send_error(404)
+            self._send_json(404, {"error": "not found"})
 
 
 def create_server(host: str = "localhost", port: int = 3000) -> HTTPServer:
