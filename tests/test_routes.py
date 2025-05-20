@@ -5,11 +5,17 @@ from urllib import request
 
 import pytest
 
-from mcp_fabric.main import create_server
+from mcp_fabric.main import (
+    ARTIFACTS,
+    WORKSPACES,
+    create_server,
+)
 
 
 @pytest.fixture(scope="module")
 def server():
+    WORKSPACES.clear()
+    ARTIFACTS.clear()
     srv = create_server(port=0)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
@@ -49,6 +55,10 @@ def test_workspaces_post(server):
     assert status == 201
     assert body == {"created": True}
 
+    status, body = _request(server, "/v1/workspaces")
+    assert status == 200
+    assert body == {"workspaces": [{"name": "test"}]}
+
 
 def test_artifacts_get(server):
     status, body = _request(server, "/v1/artifacts")
@@ -61,3 +71,7 @@ def test_artifacts_post(server):
     status, body = _request(server, "/v1/artifacts", data=data, method="POST")
     assert status == 201
     assert body == {"created": True}
+
+    status, body = _request(server, "/v1/artifacts")
+    assert status == 200
+    assert body == {"artifacts": [{"name": "test"}]}
