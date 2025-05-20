@@ -21,8 +21,7 @@ The server exposes a REST interface that acts as a bridge between the Microsoft 
    ```bash
    poetry run python -m mcp_fabric.main --stdio
    ```
-   The REST façade can be enabled with the following flag:
-   ```bash
+
    poetry run python -m mcp_fabric.main --stdio --rest
    ```
 
