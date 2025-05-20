@@ -21,5 +21,6 @@ def register_server(name: str, handler: Callable[[], None]) -> None:
 
 # Import main server and register it when package is imported
 from .main import run_server
+
 register_server("mcp-fabric-rest", run_server)
 __all__ = ["register_server", "SERVERS", "run_server"]
